@@ -5,7 +5,8 @@ module.exports = function (api) {
         presets: [
             '@babel/react',
             '@babel/preset-typescript',
-            '@babel/env'
+            '@babel/env',
+            "@emotion/babel-preset-css-prop"
         ],
     }
 }
