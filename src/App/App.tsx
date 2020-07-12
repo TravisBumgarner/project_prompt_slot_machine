@@ -1,7 +1,7 @@
 import React from 'react'
 import { css, jsx } from '@emotion/core'
 
-import slotOptions from './data/slotOptions.json'
+import { SLOT_OPTIONS } from './data'
 
 const SpinStyle = css` 
     width: 100%;    
@@ -85,45 +85,37 @@ const Reel: React.FC<ReelProps> = ({ children }) => {
             {children}
         </div>
     )
-
 }
 
-const fetchData = () => {
-    return slotOptions
+const shuffleArray = <T extends unknown>(arr: T[]) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * i)
+        const temp = arr[i]
+        arr[i] = arr[j]
+        arr[j] = temp
+    }
 }
-
-
 
 const App = () => {
-    const [reelA, setReelA] = React.useState('')
-    const [reelB, setReelB] = React.useState('')
-    const [reelC, setReelC] = React.useState('')
-
-    const spin = () => {
-        return [Math.random(), Math.random(), Math.random()]
-    }
+    const [reels, setReels] = React.useState<string[]>([])
 
     const handleSpinClick = () => {
-        const [a, b, c] = spin()
-        setReelA(a)
-        setReelB(b)
-        setReelC(c)
+        shuffleArray(SLOT_OPTIONS)
+        setReels(SLOT_OPTIONS.slice(0, 3))
     }
-
-    console.log(reelA)
 
     return (
         <AppWrapper>
             <SlotMachine>
                 <Line>
                     <Reel>
-                        <Symbol text={reelA} />
+                        <Symbol text={reels[0]} />
                     </Reel>
                     <Reel>
-                        <Symbol text={reelB} />
+                        <Symbol text={reels[1]} />
                     </Reel>
                     <Reel>
-                        <Symbol text={reelC} />
+                        <Symbol text={reels[2]} />
                     </Reel>
                 </Line>
                 <Spin onClick={handleSpinClick} />
