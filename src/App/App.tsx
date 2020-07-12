@@ -3,6 +3,36 @@ import { css, jsx } from '@emotion/core'
 
 import { SLOT_OPTIONS } from './data'
 
+const ChangeReelsStyle = css` 
+    width: 100%;    
+`
+
+type ChangeReelsProps = {
+    numberOfReels: number
+    setNumberOfReels: (change: number) => void
+}
+
+const ChangeReels: React.FC<ChangeReelsProps> = ({ numberOfReels, setNumberOfReels }) => {
+    return (
+        <>
+            <button
+                disabled={numberOfReels == SLOT_OPTIONS.length}
+                onClick={() => setNumberOfReels(numberOfReels + 1)}
+                css={ChangeReelsStyle}
+            >
+                +
+            </button>
+            <button
+                disabled={numberOfReels == 1}
+                onClick={() => setNumberOfReels(numberOfReels - 1)}
+                css={ChangeReelsStyle}
+            >
+                -
+            </button>
+        </>
+    )
+}
+
 const SpinStyle = css` 
     width: 100%;    
 `
@@ -97,26 +127,29 @@ const shuffleArray = <T extends unknown>(arr: T[]) => {
 }
 
 const App = () => {
-    const [reels, setReels] = React.useState<string[]>([])
+    const [numberOfReels, setNumberOfReels] = React.useState(4)
+    const defaultReelValues = Array(numberOfReels).fill('')
+    const [reelValues, setReelValues] = React.useState<string[]>(defaultReelValues)
 
     const handleSpinClick = () => {
         shuffleArray(SLOT_OPTIONS)
-        setReels(SLOT_OPTIONS.slice(0, 3))
+        setReelValues(SLOT_OPTIONS.slice(0, numberOfReels))
+    }
+
+    const reels = []
+    for (let i = 0; i < numberOfReels; i++) {
+        reels.push(<Reel key={i}>
+            <Symbol text={reelValues[i]} />
+        </Reel>)
     }
 
     return (
         <AppWrapper>
+
             <SlotMachine>
+                <ChangeReels numberOfReels={numberOfReels} setNumberOfReels={setNumberOfReels} />
                 <Line>
-                    <Reel>
-                        <Symbol text={reels[0]} />
-                    </Reel>
-                    <Reel>
-                        <Symbol text={reels[1]} />
-                    </Reel>
-                    <Reel>
-                        <Symbol text={reels[2]} />
-                    </Reel>
+                    {reels}
                 </Line>
                 <Spin onClick={handleSpinClick} />
             </SlotMachine>
