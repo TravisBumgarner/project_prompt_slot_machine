@@ -104,6 +104,9 @@ const ReelStyle = css`
     border: 5px solid black;
     width: 25%;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `
 
 type ReelProps = {
@@ -126,14 +129,46 @@ const shuffleArray = <T extends unknown>(arr: T[]) => {
     }
 }
 
+const sleep = (milliseconds: number) => {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+}
+
 const App = () => {
-    const [numberOfReels, setNumberOfReels] = React.useState(4)
+    const [numberOfReels, setNumberOfReels] = React.useState(3)
     const defaultReelValues = Array(numberOfReels).fill('')
     const [reelValues, setReelValues] = React.useState<string[]>(defaultReelValues)
+    // const reelValuesRef = React.useRef(['', '', '']);
 
-    const handleSpinClick = () => {
-        shuffleArray(SLOT_OPTIONS)
-        setReelValues(SLOT_OPTIONS.slice(0, numberOfReels))
+    let slotOptionIndex = 0;
+
+    const handleSpinClick = (reelNumber: number) => {
+        if (reelNumber >= numberOfReels) {
+            return
+        }
+
+        if (reelNumber === 0) {
+            setReelValues(defaultReelValues)
+        }
+
+        const spinReel = (reelNumber: number) => {
+            shuffleArray(SLOT_OPTIONS)
+            setReelValues(reelValues => {
+                const modifiedReelValues = [...reelValues]
+                modifiedReelValues[reelNumber] = SLOT_OPTIONS[slotOptionIndex % SLOT_OPTIONS.length]
+                return modifiedReelValues
+            })
+            slotOptionIndex += 1
+        }
+
+        const intervalId = setInterval(() => spinReel(reelNumber), 100)
+        setTimeout(() => {
+            clearInterval(intervalId)
+            handleSpinClick(reelNumber + 1)
+        }, 500)
     }
 
     const reels = []
@@ -145,13 +180,12 @@ const App = () => {
 
     return (
         <AppWrapper>
-
             <SlotMachine>
                 <ChangeReels numberOfReels={numberOfReels} setNumberOfReels={setNumberOfReels} />
                 <Line>
                     {reels}
                 </Line>
-                <Spin onClick={handleSpinClick} />
+                <Spin onClick={() => handleSpinClick(0)} />
             </SlotMachine>
         </AppWrapper>
     )
