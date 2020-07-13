@@ -46,7 +46,7 @@ const Spin: React.FC<{ onClick: () => void }> = ({ onClick }) => {
 const LineStyle = css`
     display: flex;
     width: 500px;
-    height: 500px;
+    height: 200px;
     justify-content: space-between;
 `
 
@@ -129,29 +129,20 @@ const shuffleArray = <T extends unknown>(arr: T[]) => {
     }
 }
 
-const sleep = (milliseconds: number) => {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
+const getRandomInt = (min: number, range: number) => {
+    return min + Math.floor(Math.random() * range)
 }
 
 const App = () => {
     const [numberOfReels, setNumberOfReels] = React.useState(3)
     const defaultReelValues = Array(numberOfReels).fill('')
     const [reelValues, setReelValues] = React.useState<string[]>(defaultReelValues)
-    // const reelValuesRef = React.useRef(['', '', '']);
 
     let slotOptionIndex = 0;
 
-    const handleSpinClick = (reelNumber: number) => {
+    const handleSpinAnimation = (reelNumber: number) => {
         if (reelNumber >= numberOfReels) {
             return
-        }
-
-        if (reelNumber === 0) {
-            setReelValues(defaultReelValues)
         }
 
         const spinReel = (reelNumber: number) => {
@@ -165,10 +156,16 @@ const App = () => {
         }
 
         const intervalId = setInterval(() => spinReel(reelNumber), 100)
+        
         setTimeout(() => {
             clearInterval(intervalId)
-            handleSpinClick(reelNumber + 1)
-        }, 500)
+            handleSpinAnimation(reelNumber + 1)
+        }, 2000)
+    }
+
+    const handleSpinClick = () => {
+        setReelValues(defaultReelValues)
+        handleSpinAnimation(0)
     }
 
     const reels = []
@@ -185,7 +182,7 @@ const App = () => {
                 <Line>
                     {reels}
                 </Line>
-                <Spin onClick={() => handleSpinClick(0)} />
+                <Spin onClick={handleSpinClick} />
             </SlotMachine>
         </AppWrapper>
     )
